@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全职高手 - 转会经纪人模拟器</title>
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="cover.css">
+    <link rel="stylesheet" href="bisai.css">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"> -->
+    <script src="lib/sweetalert2.all.min.js"></script>
+    <!-- 使用本地文件 -->
+    <link rel="stylesheet" href="lib/sweetalert2.css">
+    <!-- 数据文件 -->
+    <script src="data.js"></script>
+
+</head>
+
+<body>
+    <!-- 背景音乐 -->
+    <audio id="backgroundMusic" loop="true" preload="auto" volume="0.5" autoplay="true">
+        <source src="images/au.mp3" type="audio/mpeg">
+        您的浏览器不支持音频元素。
+    </audio>
+    
+    <!-- 新游戏封面 -->
+    <div id="gameCover" class="game-cover">
+
+        <!-- 方形粒子效果容器 -->
+        <div class="particles-container" id="particlesContainer"></div>
+
+        <div class="cover-content">
+            <!-- 电竞感四角装饰 -->
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <!-- 标签 -->
+            <div class="tag-line">
+
+            </div>
+            <!-- 主标题区 -->
+            <div class="main-title">
+                <h1 class="game-title">荣耀经纪人</h1>
+                <div class="game-subtitle"></div>
+            </div>
+
+
+
+            <!-- 游戏描述 -->
+            <p class="game-description">
+                在荣耀电竞的世界里<br>你是最顶尖的转会经纪人 <br>
+                为选手争取最佳合约，为战队组建最强阵容<br>
+                每一个决定都关乎赛季成败<br>每一次谈判都是没有硝烟的战争
+            </p>
+
+            <!-- 开始按钮 -->
+            <div class="action-buttons">
+                <button id="startGame" class="cover-btn start-btn">
+                    <span class="btn-icon">🚀</span>
+                    <span>开始职业生涯</span>
+                </button>
+                <button id="restartGame" class="cover-btn restart-btn">
+                    <span class="btn-icon">🔄</span>
+                    <span>重新开始</span>
+                </button>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- 游戏主界面保持不变 -->
+    <div id="gameMain" class="game-main" style="display: none;">
+        <!-- 状态栏 -->
+        <div class="status-bar">
+            <div class="status-item"> <span id="money">5000</span> 元</div>
+            <div class="status-item"><span id="time">第一年 夏转会期 第1天</span></div>
+            <div class="status-item"> <span id="energy">10</span>/10</div>
+        </div>
+
+        <!-- 导航栏 -->
+        <div class="nav-tabs">
+            <button class="tab-button active" data-tab="square" data-icon="📢">广场</button>
+            <button class="tab-button" data-tab="commission" data-icon="📋">委托</button>
+            <button class="tab-button" data-tab="negotiation" data-icon="🤝">谈判协商</button>
+            <button class="tab-button" data-tab="office" data-icon="🏢">工作室</button>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-area">
+            <!-- 广场页面 -->
+
+            <div id="square" class="tab-content active">
+
+                <!-- 比赛实况模块 -->
+                <div id="matchLiveSection" class="match-live hidden">
+                    <h3 class="match-title"><img src="images/teams/glory.png" alt="荣耀联赛" class="glory-icon">今日赛况</h3>
+                    <div class="match-teams">
+                        <!-- 左右队伍卡片由 JS 动态生成 -->
+                    </div>
+                    <div id="match-result" class="match-result hidden"></div>
+                </div>
+
+
+                <div class="team-map">
+                    <h2>战队地图</h2>
+                    <div id="teamEntries" class="team-entries"></div>
+                </div>
+                <div class="news-section">
+                    <h2>荣耀新闻</h2>
+                    <div id="newsList" class="news-list"></div>
+                </div>
+
+            </div>
+
+            <!-- 委托页面 -->
+            <div id="commission" class="tab-content">
+                <div class="commission-section">
+                    <h2>待接受委托</h2>
+                    <div id="availableCommissions" class="commission-list"></div>
+                </div>
+                <div class="commission-section">
+                    <h2>已接受委托</h2>
+                    <div id="acceptedCommissions" class="commission-list"></div>
+                </div>
+                <div class="commission-section">
+                    <h2>已完成委托</h2>
+                    <div id="completedCommissions" class="commission-list"></div>
+                </div>
+                <div class="commission-section" id="failedCommissionSection">
+                    <h2>失败的委托</h2>
+                    <div id="failedCommissionsList" class="commission-list"></div>
+                </div>
+            </div>
+
+            <!-- 谈判协商页面 -->
+            <!-- 谈判协商页面 -->
+            <div id="negotiation" class="tab-content">
+                <div class="commission-section">
+                    <h2>协商中的委托</h2>
+                    <div id="negotiationList" class="commission-list"></div>
+                </div>
+            </div>
+
+            <!-- 工作室页面 -->
+            <div id="office" class="tab-content">
+                <!-- 入口卡片 -->
+                <div class="office-menu">
+                    <div class="menu-card" data-menu="notebook">
+                        <div class="menu-icon">📓</div>
+                        <div class="menu-title">工作簿</div>
+                        <div class="menu-desc">属性与培训</div>
+                    </div>
+                    <div class="menu-card" data-menu="contacts">
+                        <div class="menu-icon">📇</div>
+                        <div class="menu-title">通讯录</div>
+                        <div class="menu-desc">管理联系人</div>
+                    </div>
+                    <div class="menu-card" data-menu="profile">
+                        <div class="menu-icon">😺</div>
+                        <div class="menu-title">个人档案</div>
+                        <div class="menu-desc">经纪人信息</div>
+                    </div>
+                   
+                    <!-- 新增：网友培训菜单 -->
+                    <div class="menu-card" data-menu="netizen-training">
+                        <div class="menu-icon">🎮</div>
+                        <div class="menu-title">训练室</div>
+                        <div class="menu-desc">培养网游高手职业注册</div>
+                    </div>
+
+                  
+                    <!-- 新增：小账本菜单 -->
+                    <div class="menu-card" data-menu="borrowing-book">
+                        <div class="menu-icon">💰</div>
+                        <div class="menu-title">小账本</div>
+                        <div class="menu-desc">资金管理</div>
+                    </div>
+                    
+      <div class="menu-card" data-menu="rest">
+                        <div class="menu-icon">🛌</div>
+                        <div class="menu-title">休息</div>
+                        <div class="menu-desc">恢复能量</div>
+                    </div>                 
+                    
+                    <!-- 新增：存档管理菜单 -->
+                    <div class="menu-card" data-menu="save-manager">
+                        <div class="menu-icon">💾</div>
+                        <div class="menu-title">存档管理</div>
+                        <div class="menu-desc">存档、读档、退出</div>
+                    </div>
+                    <!-- 新增：游戏说明菜单 -->
+                    <div class="menu-card" data-menu="game-info">
+                        <div class="menu-icon">❓</div>
+                        <div class="menu-title">游戏说明</div>
+                        <div class="menu-desc">游戏相关信息</div>
+                    </div>
+                </div>
+
+                <!-- 记事本内容 -->
+                <div id="notebook" class="office-content">
+                    <div class="office-header">
+                        <h2>记事本</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="attributes-section">
+                        <h3>经纪人属性</h3>
+                        <div id="attributesList" class="attributes-list"></div>
+                    </div>
+                    <div class="training-section"></div>
+                </div>
+
+                <!-- 通讯录内容 -->
+                <div id="contacts" class="office-content">
+                    <div class="office-header">
+                        <h2>通讯录</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="contacts-container">
+                        <!-- 左侧战队页签 -->
+                        <div class="teams-sidebar">
+                            <div class="sidebar-header">
+                                <h3>战队列表</h3>
+                            </div>
+                            <div id="teamsList" class="teams-list"></div>
+                        </div>
+
+                        <!-- 右侧人员列表 -->
+                        <div class="team-members">
+                            <div class="members-header">
+                                <h3 id="currentTeamName">请选择战队</h3>
+                                <div id="membersCount" class="members-count"></div>
+                            </div>
+                            <div id="teamMembersList" class="team-members-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 个人档案内容 -->
+                <div id="profile" class="office-content">
+                    <div class="office-header">
+                        <h2>个人档案</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="profile-section">
+                        <div class="profile-info">
+                            <div class="profile-item">
+                                <label for="agentName">经纪人昵称:</label>
+                                <input type="text" id="agentName" placeholder="请输入昵称">
+                            </div>
+                            <div class="profile-item">
+                                <label for="studioName">工作室名称:</label>
+                                <input type="text" id="studioName" placeholder="请输入工作室名称">
+                            </div>
+                            <div class="profile-item">
+                                <label>当前资金:</label>
+                                <span id="profileMoney">0</span> 元
+                            </div>
+                            <div class="profile-item">
+                                <label>成交委托数:</label>
+                                <span id="profileCompleted">0</span> 个
+                            </div>
+                            <div class="profile-item">
+                                <label>声望等级:</label>
+                                <span id="profileReputation">1</span> 级
+                            </div>
+                        </div>
+                        <button id="saveProfileBtn" class="btn btn-primary">保存信息</button>
+                    </div>
+                </div>
+
+               
+
+                <!-- 网友培训内容 -->
+                <div id="netizen-training" class="office-content">
+                    <div class="office-header">
+                        <h2>网友培训</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="training-intro">
+                        <p>在这里培养你在「荣耀网游」中认识的朋友，助他们走向职业道路！</p>
+                    </div>
+                    <div id="contact-netizens-list" class="netizen-list">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+
+
+
+                <!-- 小账本内容 -->
+                <div id="borrowing-book" class="office-content">
+                    <div class="office-header">
+                        <h2>小账本</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="borrowing-section">
+                        <div class="borrowing-tabs">
+                            <button class="borrowing-tab active" data-tab="commission-income">委托金清单</button>
+                            <button class="borrowing-tab" data-tab="match-dividend">选手赛事分红</button>
+                            <button class="borrowing-tab" data-tab="borrowing-list">借款清单</button>
+                        </div>
+                        
+                        <!-- 委托金清单 -->
+                        <div id="commission-income" class="borrowing-tab-content active">
+                            <div class="borrowing-header">
+                                <h3>委托金收入记录</h3>
+                            </div>
+                            <div class="income-summary">
+                                <div class="summary-item">
+                                    <label>总收入：</label>
+                                    <span id="totalCommissionIncome" class="amount-text positive">0</span> 元
+                                </div>
+                                <div class="summary-item">
+                                    <label>委托数量：</label>
+                                    <span id="totalCommissionCount" class="count-text">0</span> 笔
+                                </div>
+                            </div>
+                            <div class="income-list" id="commissionIncomeList">
+                                <div class="empty-message">暂无委托收入记录</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 选手赛事分红 -->
+                        <div id="match-dividend" class="borrowing-tab-content">
+                            <div class="borrowing-header">
+                                <h3>选手赛事分红记录</h3>
+                            </div>
+                            <div class="income-summary">
+                                <div class="summary-item">
+                                    <label>总分红：</label>
+                                    <span id="totalMatchDividend" class="amount-text positive">0</span> 元
+                                </div>
+                               
+                            </div>
+                            <div class="income-list" id="matchDividendList">
+                                <div class="empty-message">暂无赛事分红记录</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 借款清单 -->
+                        <div id="borrowing-list" class="borrowing-tab-content">
+                            <div class="borrowing-header">
+                                <h3>借款记录管理</h3>
+                            </div>
+                              <div class="borrowing-summary">
+                                    <div class="summary-item">
+                                        <label>借款总额：</label>
+                                        <span id="borrowingTotalAmount" class="amount-text negative">0</span> 元
+                                    </div>
+                                </div>
+                            <div class="borrowing-info">
+                                <div class="borrowing-item-full">
+                                    <label>借款明细：</label>
+                                    <div id="borrowingDetails" class="borrowing-details">无借款记录</div>
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- 休息内容 -->
+                <div id="rest" class="office-content">
+                    <div class="office-header">
+                        <h2>休息</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="rest-section">
+                        <div class="rest-info">
+                            <p>当前能量: <span id="restEnergyDisplay">10</span>/10</p>
+                            <p>休息后: 能量恢复满，时间前进一天</p>
+                            <p>早睡早起身体好~</p>
+                        </div>
+                        <button id="restButton">开始休息</button>
+                    </div>
+                </div>
+
+                <!-- 存档管理内容 -->
+                <div id="save-manager" class="office-content">
+                    <div class="office-header">
+                        <h2>存档管理</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="save-manager-container">
+                        <!-- 三个功能按钮（默认显示） -->
+                        <div id="saveMenuButtons" class="save-menu-buttons">
+                            <button class="save-menu-btn" onclick="showSaveSlots('save')">
+                                <span class="save-menu-icon">💾</span>
+                                <span class="save-menu-text">存档</span>
+                            </button>
+                            <button class="save-menu-btn" onclick="showSaveSlots('load')">
+                                <span class="save-menu-icon">📂</span>
+                                <span class="save-menu-text">读档</span>
+                            </button>
+                            <button class="save-menu-btn music-btn" onclick="toggleMusic()">
+                                <span class="save-menu-icon" id="musicIcon">🔊</span>
+                                <span class="save-menu-text">音乐开关</span>
+                            </button>
+                            <button class="save-menu-btn exit-btn" onclick="exitGame()">
+                                <span class="save-menu-icon">🚪</span>
+                                <span class="save-menu-text">退出游戏</span>
+                            </button>
+                        </div>
+                        <!-- 存档格子区域（默认隐藏） -->
+                        <div id="saveSlotContainer" class="save-slot-container" style="display: none;">
+                            <div class="save-slot-header">
+                                <h3 id="saveSlotTitle">选择存档位</h3>
+                                <button class="btn btn-secondary" onclick="hideSaveSlots()">返回</button>
+                            </div>
+                            <div id="saveSlotGrid" class="save-slot-grid">
+                                <!-- 9个存档格子由JS动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 游戏说明内容 -->
+                <div id="game-info" class="office-content">
+                    <div class="office-header">
+                        <h2>游戏说明</h2>
+                        <button class="btn btn-primary" onclick="backToOfficeMenu()">返回工作室</button>
+                    </div>
+                    <div class="game-info-section">
+                        <div class="game-info-content">
+                            <h3>《全职高手》同人游戏</h3>
+                            <p>本游戏是基于《全职高手》小说的非营利性同人作品，仅供爱好者交流学习使用。</p>
+<p> ✅ 时间操作 </p>             <p> ✅ 蝴蝶效应</p>    
+<p> ✅ 随机数据 </p> 
+<p> ✅ 强行主线</p>
+
+
+<h3>资源说明</h3>
+
+ <p>图片来源:官图</p>              <p>越云队徽来源:鸽子烹饪十八式 太太 感谢！！</p>             
+ 
+ 
+<h3>技术支持</h3>
+                            <p>感谢以下AI工具的技术支持：</p>
+                            <ul>
+                                <li>DeepSeek</li>
+                                <li>通义</li>
+                                <li>Trea</li>
+                                <li>Qoder</li>
+                            </ul>
+                            
+                            <h3>作者信息</h3>
+                            <p>作者：小红书 @春日迟迟迟</p>
+ <p>欢迎大家找我玩~🐱</p>                           
+                            <div class="disclaimer">
+                                <p><strong>免责声明：</strong>本游戏为非营利性质的同人作品，为爱发电，如在设定中有错误或疏漏，大家见谅。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 聊天专用模态框 -->
+    <div id="dialogueModal" class="dialogue-modal" style="display: none;">
+        <div id="dialogueContent" class="npc-modal-content"></div>
+    </div>
+
+
+    <!-- 选手卡片模态框 -->
+    <div id="playerCardModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <!-- 卡片内容由JS动态生成 -->
+            <div id="playerCard" class="player-card"></div>
+        </div>
+    </div>
+
+    <!-- 委托详情模态框 -->
+    <div id="commissionDetailModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="commissionDetail" class="commission-detail"></div>
+        </div>
+    </div>
+
+    <!-- 协商详情模态框 -->
+    <div id="negotiationDetailModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="negotiationDetail" class="negotiation-detail"></div>
+        </div>
+    </div>
+
+    <!-- 培训详情页（初始隐藏） -->
+    <div id="netizen-training-detail-page" class="hidden"></div>
+
+    <script src="cover.js"></script>
+    <script src="autosave.js"></script>
+    <script src="chat.js"></script>
+    <script src="news.js"></script>
+    <script src="train.js"></script>
+      <script src="bisai.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
